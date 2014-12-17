@@ -10,14 +10,17 @@
         <parameter key="oauth2.storage.authorization_code.class">OAuth2\ServerBundle\Storage\AuthorizationCode</parameter>
         <parameter key="oauth2.storage.user_credentials.class">OAuth2\ServerBundle\Storage\UserCredentials</parameter>
         <parameter key="oauth2.storage.refresh_token.class">OAuth2\ServerBundle\Storage\RefreshToken</parameter>
+        <parameter key="oauth2.storage.jwt_bearer.class">OAuth2\ServerBundle\Storage\JwtBearer</parameter>
         <parameter key="oauth2.storage.scope.class">OAuth2\ServerBundle\Storage\Scope</parameter>
         <parameter key="oauth2.grant_type.client_credentials.class">OAuth2\GrantType\ClientCredentials</parameter>
         <parameter key="oauth2.grant_type.authorization_code.class">OAuth2\GrantType\AuthorizationCode</parameter>
         <parameter key="oauth2.grant_type.refresh_token.class">OAuth2\GrantType\RefreshToken</parameter>
         <parameter key="oauth2.grant_type.user_credentials.class">OAuth2\GrantType\UserCredentials</parameter>
+        <parameter key="oauth2.grant_type.jwt_bearer.class">OAuth2\GrantType\JwtBearer</parameter>
         <parameter key="oauth2.user_provider.class">OAuth2\ServerBundle\User\OAuth2UserProvider</parameter>
         <parameter key="oauth2.client_manager.class">OAuth2\ServerBundle\Manager\ClientManager</parameter>
         <parameter key="oauth2.scope_manager.class">OAuth2\ServerBundle\Manager\ScopeManager</parameter>
+        <parameter key="oauth2.encryption.jwt.class">OAuth2\Encryption\Jwt</parameter>
     </parameters>
     <services>
         <service id="oauth2.server" class="%oauth2.server.class%">
@@ -27,6 +30,7 @@
                 <argument type="service" id="oauth2.storage.authorization_code" />
                 <argument type="service" id="oauth2.storage.user_credentials" />
                 <argument type="service" id="oauth2.storage.refresh_token" />
+                <argument type="service" id="oauth2.storage.jwt_bearer" />
                 <argument type="service" id="oauth2.storage.scope" />
             </argument>
         </service>
@@ -58,6 +62,9 @@
         <service id="oauth2.storage.refresh_token" class="%oauth2.storage.refresh_token.class%">
             <argument type="service" id="doctrine.orm.entity_manager"/>
         </service>
+        <service id="oauth2.storage.jwt_bearer" class="%oauth2.storage.jwt_bearer.class%">
+            <argument type="service" id="doctrine.orm.entity_manager"/>
+        </service>
         <service id="oauth2.storage.scope" class="%oauth2.storage.scope.class%">
             <argument type="service" id="doctrine.orm.entity_manager"/>
             <argument type="service" id="oauth2.scope_manager"/>
@@ -77,9 +84,15 @@
                 <argument key="always_issue_new_refresh_token">false</argument>
             </argument>
         </service>
+        <service id="oauth2.grant_type.jwt_bearer" class="%oauth2.grant_type.jwt_bearer.class%">
+            <argument type="service" id="oauth2.storage.jwt_bearer"/>
+            <argument type="string">%oauth2.jwt.audience%</argument>
+            <argument type="service" id="oauth2.encryption.jwt"/>
+        </service>
         <service id="oauth2.client_manager" class="%oauth2.client_manager.class%">
             <argument type="service" id="doctrine.orm.entity_manager"/>
             <argument type="service" id="oauth2.scope_manager"/>
         </service>
+        <service id="oauth2.encryption.jwt" class="%oauth2.encryption.jwt.class%"/>
     </services>
 </container>
