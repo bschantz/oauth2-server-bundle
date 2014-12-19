@@ -8,8 +8,6 @@
 namespace OAuth2\ServerBundle\Security\Token;
 
 
-use OAuth2\ServerBundle\Security\OAuthToken;
-
 class JwtOAuthToken extends OAuthToken
 {
 

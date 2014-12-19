@@ -5,7 +5,7 @@
  * Time: 1:27 PM
  */
 
-namespace OAuth2\ServerBundle\Security;
+namespace OAuth2\ServerBundle\Security\Token;
 
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 

@@ -26,11 +26,15 @@ class JwtOAuthProvider implements AuthenticationProviderInterface
     /** @var $publicKey string */
     protected $publicKey;
 
-    public function __constructor(UserProviderInterface $userProvider, Server $oauthServer, $publicKey)
+    public function __construct(UserProviderInterface $userProvider, Server $oauthServer, $publicKeyFile)
     {
         $this->userProvider = $userProvider;
         $this->server = $oauthServer;
-        $this->publicKey = $publicKey;
+        if (file_exists($publicKeyFile)) {
+            $this->publicKey = file_get_contents($publicKeyFile);
+        } else {
+            throw new \InvalidArgumentException("Keyfile $publicKeyFile does not exist.");
+        }
     }
 
     /**
@@ -51,8 +55,7 @@ class JwtOAuthProvider implements AuthenticationProviderInterface
         if (!($decodedToken = $j->decode($jwt, $this->publicKey))) {
             throw new AuthenticationException("Could not decode token");
         }
-        $payload = json_decode($decodedToken);
-        $user = $this->userProvider->loadUserByUsername($payload->sub);
+        $user = $this->userProvider->loadUserByUsername($decodedToken['sub']);
         if (!$user) {
             throw new AuthenticationException("Invalid subject");
         }

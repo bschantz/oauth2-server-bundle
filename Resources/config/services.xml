@@ -21,6 +21,8 @@
         <parameter key="oauth2.client_manager.class">OAuth2\ServerBundle\Manager\ClientManager</parameter>
         <parameter key="oauth2.scope_manager.class">OAuth2\ServerBundle\Manager\ScopeManager</parameter>
         <parameter key="oauth2.encryption.jwt.class">OAuth2\Encryption\Jwt</parameter>
+        <parameter key="oauth2.auth.listener.class">OAuth2\ServerBundle\Security\Firewall\OAuthSecurityListener</parameter>
+        <parameter key="oauth2.auth.jwt.provider.class">OAuth2\ServerBundle\Security\Authentication\Provider\JwtOAuthProvider</parameter>
     </parameters>
     <services>
         <service id="oauth2.server" class="%oauth2.server.class%">
@@ -94,5 +96,16 @@
             <argument type="service" id="oauth2.scope_manager"/>
         </service>
         <service id="oauth2.encryption.jwt" class="%oauth2.encryption.jwt.class%"/>
+        <service id="oauth2.auth.jwt.provider" class="%oauth2.auth.jwt.provider.class%" public="false">
+            <argument type="service" id="oauth2.user_provider" />
+            <argument type="service" id="oauth2.server"/>
+            <argument type="string">%jwt_public_key%</argument>
+        </service>
+        <service id="oauth2.auth.listener"
+                 class="%oauth2.auth.listener.class%"
+                 public="false">
+            <argument type="service" id="security.context"/>
+            <argument type="service" id="security.authentication.manager"/>
+        </service>
     </services>
 </container>

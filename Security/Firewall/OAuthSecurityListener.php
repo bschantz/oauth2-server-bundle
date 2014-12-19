@@ -6,8 +6,8 @@
  */
 namespace OAuth2\ServerBundle\Security\Firewall;
 
-use OAuth2\Encryption\Jwt;
-use OAuth2\ServerBundle\Security\OAuthToken;
+use OAuth2\HttpFoundationBridge\Request as BridgeRequest;
+use OAuth2\ServerBundle\Security\Token\JwtOAuthToken;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -15,23 +15,19 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 
 class OAuthSecurityListener implements ListenerInterface
 {
 
     protected $securityContext;
-
-    protected $tokenStorage;
+    protected $authenticationManager;
 
     public function __construct(
             SecurityContext $context,
-            TokenStorageInterface $storage,
             AuthenticationManagerInterface $authenticationManager
     ) {
         $this->securityContext = $context;
-        $this->tokenStorage = $storage;
         $this->authenticationManager = $authenticationManager;
     }
 
@@ -42,7 +38,7 @@ class OAuthSecurityListener implements ListenerInterface
      */
     public function handle(GetResponseEvent $event)
     {
-        $request = $event->getRequest();
+        $request = BridgeRequest::createFromGlobals();
         $auth = explode(' ', $request->headers->get('Authorization'));
         if ($auth[0] == 'Bearer') {
             $jwt = $auth[1];
@@ -50,14 +46,21 @@ class OAuthSecurityListener implements ListenerInterface
             return;
         }
 
-        $token = new OAuthToken();
+        $token = new JwtOAuthToken();
+        $token->setToken($jwt);
 
         // verify token
         try {
-            $this->authenticationManager->authenticate($token);
+            $authToken = $this->authenticationManager->authenticate($token);
+            $this->securityContext->setToken($authToken);
+            return;
         } catch (AuthenticationException $exc) {
             throw $exc;
         }
+
+        $response = new Response();
+        $response->setStatusCode(Response::HTTP_FORBIDDEN);
+        $event->setResponse($response);
     }
 
     /**
