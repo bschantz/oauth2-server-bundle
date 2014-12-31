@@ -24,7 +24,6 @@ class TokenController extends Controller
         $server->addGrantType($this->get('oauth2.grant_type.authorization_code'));
         $server->addGrantType($this->get('oauth2.grant_type.refresh_token'));
         $server->addGrantType($this->get('oauth2.grant_type.user_credentials'));
-        $server->addGrantType($this->get('oauth2.grant_type.jwt_bearer'));
 
         return $server->handleTokenRequest($this->get('oauth2.request'), $this->get('oauth2.response'));
     }

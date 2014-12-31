@@ -1,6 +1,6 @@
 <?php
 /**
- * User: bschantz
+ * User: Brian Schantz
  * Date: 12/17/14
  * Time: 10:00 AM
  */
@@ -15,16 +15,16 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
-class JwtOAuthFactory implements SecurityFactoryInterface
+class OAuth2SecurityFactory implements SecurityFactoryInterface
 {
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
-        $providerId = 'oauth2.auth.jwt.provider.' . $id;
+        $providerId = 'oauth2.auth.id_token.provider.' . $id;
         $container
-                ->setDefinition($providerId, new DefinitionDecorator('oauth2.auth.jwt.provider'))
+                ->setDefinition($providerId, new DefinitionDecorator('oauth2.auth.id_token.provider'))
                 ->replaceArgument(0, new Reference($userProvider))
                 ->replaceArgument(1, new Reference('oauth2.server'))
-                ->replaceArgument(2, $container->getParameter('jwt_public_key'));
+                ->replaceArgument(2, new Reference('oauth2.storage.public_key'));
 
         $listenerId = 'oauth2.auth.listener.' . $id;
         $container

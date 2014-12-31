@@ -7,22 +7,23 @@
         <parameter key="oauth2.response.class">OAuth2\HttpFoundationBridge\Response</parameter>
         <parameter key="oauth2.storage.client_credentials.class">OAuth2\ServerBundle\Storage\ClientCredentials</parameter>
         <parameter key="oauth2.storage.access_token.class">OAuth2\ServerBundle\Storage\AccessToken</parameter>
-        <parameter key="oauth2.storage.authorization_code.class">OAuth2\ServerBundle\Storage\AuthorizationCode</parameter>
+        <parameter key="oauth2.storage.authorization_code.class">OAuth2\ServerBundle\OpenID\Storage\AuthorizationCode</parameter>
         <parameter key="oauth2.storage.user_credentials.class">OAuth2\ServerBundle\Storage\UserCredentials</parameter>
         <parameter key="oauth2.storage.refresh_token.class">OAuth2\ServerBundle\Storage\RefreshToken</parameter>
         <parameter key="oauth2.storage.jwt_bearer.class">OAuth2\ServerBundle\Storage\JwtBearer</parameter>
+        <parameter key="oauth2.storage.user_claims.class">OAuth2\ServerBundle\Storage\UserClaims</parameter>
         <parameter key="oauth2.storage.scope.class">OAuth2\ServerBundle\Storage\Scope</parameter>
+        <parameter key="oauth2.storage.public_key.class">OAuth2\ServerBundle\Storage\PublicKey</parameter>
         <parameter key="oauth2.grant_type.client_credentials.class">OAuth2\GrantType\ClientCredentials</parameter>
         <parameter key="oauth2.grant_type.authorization_code.class">OAuth2\GrantType\AuthorizationCode</parameter>
         <parameter key="oauth2.grant_type.refresh_token.class">OAuth2\GrantType\RefreshToken</parameter>
         <parameter key="oauth2.grant_type.user_credentials.class">OAuth2\GrantType\UserCredentials</parameter>
-        <parameter key="oauth2.grant_type.jwt_bearer.class">OAuth2\GrantType\JwtBearer</parameter>
         <parameter key="oauth2.user_provider.class">OAuth2\ServerBundle\User\OAuth2UserProvider</parameter>
         <parameter key="oauth2.client_manager.class">OAuth2\ServerBundle\Manager\ClientManager</parameter>
         <parameter key="oauth2.scope_manager.class">OAuth2\ServerBundle\Manager\ScopeManager</parameter>
         <parameter key="oauth2.encryption.jwt.class">OAuth2\Encryption\Jwt</parameter>
         <parameter key="oauth2.auth.listener.class">OAuth2\ServerBundle\Security\Firewall\OAuthSecurityListener</parameter>
-        <parameter key="oauth2.auth.jwt.provider.class">OAuth2\ServerBundle\Security\Authentication\Provider\JwtOAuthProvider</parameter>
+        <parameter key="oauth2.auth.id_token.provider.class">OAuth2\ServerBundle\Security\Authentication\Provider\OAuthIdTokenProvider</parameter>
     </parameters>
     <services>
         <service id="oauth2.server" class="%oauth2.server.class%">
@@ -32,7 +33,8 @@
                 <argument type="service" id="oauth2.storage.authorization_code" />
                 <argument type="service" id="oauth2.storage.user_credentials" />
                 <argument type="service" id="oauth2.storage.refresh_token" />
-                <argument type="service" id="oauth2.storage.jwt_bearer" />
+                <argument type="service" id="oauth2.storage.user_claims" />
+                <argument type="service" id="oauth2.storage.public_key" />
                 <argument type="service" id="oauth2.storage.scope" />
             </argument>
         </service>
@@ -64,8 +66,13 @@
         <service id="oauth2.storage.refresh_token" class="%oauth2.storage.refresh_token.class%">
             <argument type="service" id="doctrine.orm.entity_manager"/>
         </service>
-        <service id="oauth2.storage.jwt_bearer" class="%oauth2.storage.jwt_bearer.class%">
-            <argument type="service" id="doctrine.orm.entity_manager"/>
+        <service id="oauth2.storage.user_claims" class="%oauth2.storage.user_claims.class%">
+            <argument type="service" id="oauth2.user_provider"/>
+        </service>
+        <service id="oauth2.storage.public_key" class="%oauth2.storage.public_key.class%">
+            <argument type="string">%oauth2.encryption.public_key%</argument>
+            <argument type="string">%oauth2.encryption.private_key%</argument>
+            <argument type="string">%oauth2.encryption.algorithm%</argument>
         </service>
         <service id="oauth2.storage.scope" class="%oauth2.storage.scope.class%">
             <argument type="service" id="doctrine.orm.entity_manager"/>
@@ -86,20 +93,15 @@
                 <argument key="always_issue_new_refresh_token">false</argument>
             </argument>
         </service>
-        <service id="oauth2.grant_type.jwt_bearer" class="%oauth2.grant_type.jwt_bearer.class%">
-            <argument type="service" id="oauth2.storage.jwt_bearer"/>
-            <argument type="string">%oauth2.jwt.audience%</argument>
-            <argument type="service" id="oauth2.encryption.jwt"/>
-        </service>
         <service id="oauth2.client_manager" class="%oauth2.client_manager.class%">
             <argument type="service" id="doctrine.orm.entity_manager"/>
             <argument type="service" id="oauth2.scope_manager"/>
         </service>
         <service id="oauth2.encryption.jwt" class="%oauth2.encryption.jwt.class%"/>
-        <service id="oauth2.auth.jwt.provider" class="%oauth2.auth.jwt.provider.class%" public="false">
+        <service id="oauth2.auth.id_token.provider" class="%oauth2.auth.id_token.provider.class%" public="false">
             <argument type="service" id="oauth2.user_provider" />
             <argument type="service" id="oauth2.server"/>
-            <argument type="string">%jwt_public_key%</argument>
+            <argument type="service" id="oauth2.storage.public_key"/>
         </service>
         <service id="oauth2.auth.listener"
                  class="%oauth2.auth.listener.class%"

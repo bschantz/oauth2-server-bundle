@@ -12,10 +12,16 @@
         }
     ],
     "minimum-stability":"dev",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/bschantz/oauth2-server-php"
+        }
+    ],
     "require": {
         "php": ">=5.3.0",
-        "bshaffer/oauth2-server-php": ">=1.0",
-        "bshaffer/oauth2-server-httpfoundation-bridge": ">=1.0"
+        "bshaffer/oauth2-server-php": "dev-bschantz-develop as 1.x-dev",
+        "bshaffer/oauth2-server-httpfoundation-bridge": "dev-master"
     },
     "require-dev": {
         "symfony/symfony":                  "2.5.*",

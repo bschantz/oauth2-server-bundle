@@ -1,6 +1,6 @@
 <?php
 /**
- * User: bschantz
+ * User: Brian Schantz
  * Date: 12/17/14
  * Time: 8:45 AM
  */
@@ -8,14 +8,14 @@ namespace OAuth2\ServerBundle\Security\Authentication\Provider;
 
 use OAuth2\Encryption\Jwt;
 use OAuth2\Server;
-use OAuth2\ServerBundle\Security\OAuthToken;
 use OAuth2\ServerBundle\Security\Token\JwtOAuthToken;
+use OAuth2\Storage\PublicKeyInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-class JwtOAuthProvider implements AuthenticationProviderInterface
+class OAuthIdTokenProvider implements AuthenticationProviderInterface
 {
     /** @var $userProvider UserProviderInterface */
     protected $userProvider;
@@ -23,18 +23,14 @@ class JwtOAuthProvider implements AuthenticationProviderInterface
     /** @var $server Server */
     protected $server;
 
-    /** @var $publicKey string */
+    /** @var $publicKey PublicKeyInterface */
     protected $publicKey;
 
-    public function __construct(UserProviderInterface $userProvider, Server $oauthServer, $publicKeyFile)
+    public function __construct(UserProviderInterface $userProvider, Server $oauthServer, PublicKeyInterface $publicKey)
     {
         $this->userProvider = $userProvider;
         $this->server = $oauthServer;
-        if (file_exists($publicKeyFile)) {
-            $this->publicKey = file_get_contents($publicKeyFile);
-        } else {
-            throw new \InvalidArgumentException("Keyfile $publicKeyFile does not exist.");
-        }
+        $this->publicKey = $publicKey;
     }
 
     /**
@@ -52,7 +48,8 @@ class JwtOAuthProvider implements AuthenticationProviderInterface
         $jwt = $token->getToken();
         // decode token
         $j = new Jwt();
-        if (!($decodedToken = $j->decode($jwt, $this->publicKey))) {
+
+        if (!($decodedToken = $j->decode($jwt, $this->publicKey->getPublicKey()))) {
             throw new AuthenticationException("Could not decode token");
         }
         $user = $this->userProvider->loadUserByUsername($decodedToken['sub']);

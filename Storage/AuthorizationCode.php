@@ -2,9 +2,8 @@
 
 namespace OAuth2\ServerBundle\Storage;
 
-use OAuth2\Storage\AuthorizationCodeInterface;
 use Doctrine\ORM\EntityManager;
-use OAuth2\ServerBundle\Entity\Client;
+use OAuth2\Storage\AuthorizationCodeInterface;
 
 class AuthorizationCode implements AuthorizationCodeInterface
 {
@@ -25,7 +24,7 @@ class AuthorizationCode implements AuthorizationCodeInterface
      * @param $code
      * Authorization code to be check with.
      *
-     * @return
+     * @return array|null
      * An associative array as below, and NULL if the code is invalid
      * @code
      * return array(
@@ -70,19 +69,20 @@ class AuthorizationCode implements AuthorizationCodeInterface
      *
      * Required for OAuth2::GRANT_TYPE_AUTH_CODE.
      *
-     * @param $code
+     * @param string $code
      * Authorization code to be stored.
-     * @param $client_id
+     * @param mixed $client_id
      * Client identifier to be stored.
-     * @param $user_id
+     * @param mixed $user_id
      * User identifier to be stored.
      * @param string $redirect_uri
      *                             Redirect URI(s) to be stored in a space-separated string.
-     * @param int    $expires
+     * @param int $expires
      *                             Expiration to be stored as a Unix timestamp.
      * @param string $scope
      *                             (optional) Scopes to be stored in space-separated string.
      *
+     * @throws \Exception
      * @ingroup oauth2_section_4
      */
     public function setAuthorizationCode($code, $client_id, $user_id, $redirect_uri, $expires, $scope = null)
@@ -104,7 +104,7 @@ class AuthorizationCode implements AuthorizationCodeInterface
     }
 
     /**
-     * once an Authorization Code is used, it must be exipired
+     * once an Authorization Code is used, it must be expired
      *
      * @see http://tools.ietf.org/html/rfc6749#section-4.1.2
      *

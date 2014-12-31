@@ -1,6 +1,6 @@
 <?php
 /**
- * User: bschantz
+ * User: Brian Schantz
  * Date: 12/8/14
  * Time: 1:27 PM
  */
