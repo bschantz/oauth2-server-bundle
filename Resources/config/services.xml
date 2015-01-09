@@ -24,6 +24,7 @@
         <parameter key="oauth2.encryption.jwt.class">OAuth2\Encryption\Jwt</parameter>
         <parameter key="oauth2.auth.listener.class">OAuth2\ServerBundle\Security\Firewall\OAuthSecurityListener</parameter>
         <parameter key="oauth2.auth.id_token.provider.class">OAuth2\ServerBundle\Security\Authentication\Provider\OAuthIdTokenProvider</parameter>
+        <parameter key="oauth2.auth.username_password.provider.class">OAuth2\ServerBundle\Security\Authentication\Provider\UsernamePasswordRequestProvider</parameter>
     </parameters>
     <services>
         <service id="oauth2.server" class="%oauth2.server.class%">
@@ -108,6 +109,10 @@
                  public="false">
             <argument type="service" id="security.context"/>
             <argument type="service" id="security.authentication.manager"/>
+        </service>
+        <service id="oauth2.auth.username_password.provider"
+                 class="%oauth2.auth.username_password.provider.class%">
+            <argument type="service" id="oauth2.user_provider"/>
         </service>
     </services>
 </container>
