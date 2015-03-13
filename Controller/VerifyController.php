@@ -2,6 +2,7 @@
 
 namespace OAuth2\ServerBundle\Controller;
 
+use OAuth2\Server;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,6 +18,7 @@ class VerifyController extends Controller
      */
     public function verifyAction()
     {
+        /** @var Server $server */
         $server = $this->get('oauth2.server');
 
         if (!$server->verifyResourceRequest($this->get('oauth2.request'), $this->get('oauth2.response'))) {

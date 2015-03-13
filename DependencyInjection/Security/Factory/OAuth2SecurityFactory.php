@@ -47,7 +47,7 @@ class OAuth2SecurityFactory implements SecurityFactoryInterface
 
     public function getKey()
     {
-        return 'oauth_jwt';
+        return 'oauth2';
     }
 
 }

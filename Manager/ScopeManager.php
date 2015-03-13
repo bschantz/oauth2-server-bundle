@@ -3,6 +3,7 @@
 namespace OAuth2\ServerBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
+use OAuth2\ServerBundle\Entity\Scope;
 
 class ScopeManager implements ScopeManagerInterface
 {
@@ -63,5 +64,20 @@ class ScopeManager implements ScopeManagerInterface
             ->getQuery()->getResult();
 
         return $scopeObjects;
+    }
+
+    /**
+     * Find all scopes configured in this system
+     *
+     * @return array
+     */
+    public function findAllScopes()
+    {
+        $scopeObjects = $this->em->getRepository('OAuth2ServerBundle:Scope')->findAll();
+        $scopes = [];
+        /** @var Scope $scopeObject */
+        foreach ($scopeObjects as $scopeObject) {
+            $scopes[] = $scopeObject->getScope();
+        }
     }
 }

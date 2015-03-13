@@ -23,7 +23,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * Allows authentication by passing username and password in request parameters. Required for
  * OpenID Connect Resource Owner Credentials flow. Obviously, this should only be used over HTTPS!
  *
- * Based on APIKeyAuthenticator described at {@link http://symfony.com/doc/current/cookbook/security/api_key_authentication.html}
+ * Based on APIKeyAuthenticator described at {@link
+ * http://symfony.com/doc/current/cookbook/security/api_key_authentication.html}
  *
  * @package OAuth2\ServerBundle\Security\Authentication\Provider
  */

@@ -43,7 +43,10 @@ class AuthorizeController extends Controller
         $server = $this->get('oauth2.server');
 
         // get the logged-in user -- this will be the subject if an id_token is issued
-        $user = $this->get('security.context')->getToken()->getUser();
+        $token = $this->get('security.context')->getToken();
+        if ($token) {
+            $user = $token->getUser();
+        }
         $userId = $user ? $user->getEmailCanonical() : null;
 
         return $server->handleAuthorizeRequest($this->get('oauth2.request'), $this->get('oauth2.response'), true, $userId);

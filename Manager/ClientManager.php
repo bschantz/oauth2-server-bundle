@@ -3,7 +3,9 @@
 namespace OAuth2\ServerBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
+use OAuth2\ServerBundle\Entity\Client;
 use OAuth2\ServerBundle\Exception\ScopeNotFoundException;
+use OAuth2\ServerBundle\Security\Token\OAuthAccessToken;
 
 class ClientManager
 {
@@ -24,18 +26,18 @@ class ClientManager
      * Creates a new client
      *
      * @param string $identifier
-     *
      * @param array $redirect_uris
-     *
-     * @param array $grant_type
-     *
+     * @param array $grant_types
      * @param array $scopes
      *
      * @return Client
+     * @throws ScopeNotFoundException
+     * @internal param array $grant_type
+     *
      */
     public function createClient($identifier, array $redirect_uris = array(), array $grant_types = array(), array $scopes = array())
     {
-        $client = new \OAuth2\ServerBundle\Entity\Client();
+        $client = new Client();
         $client->setClientId($identifier);
         $client->setClientSecret($this->generateSecret());
         $client->setRedirectUri($redirect_uris);
@@ -67,5 +69,16 @@ class ClientManager
     protected function generateSecret()
     {
         return base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
+    }
+
+    /**
+     * @param string $tokenString
+     * @return null|Client
+     */
+    public function findClientByAccessToken($tokenString)
+    {
+        $repo = $this->em->getRepository('OAuth2ServerBundle:Client');
+        $client = $repo->findOneBy(array('token' => $tokenString));
+        return $client;
     }
 }
